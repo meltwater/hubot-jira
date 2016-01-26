@@ -12,6 +12,7 @@
 #   HUBOT_JIRA_USERNAME (optional)
 #   HUBOT_JIRA_PASSWORD (optional)
 #   HUBOT_JIRA_IGNORE_USERS (optional, format: "user1|user2", default is "jira|github")
+#   HUBOT_JIRA_ISSUE_LOOKUP (optional; default is "true")
 #
 # Commands:
 #   hubot move jira <issue ID> to <status> - Changes the status of <issue ID> to <status>
@@ -29,6 +30,7 @@ module.exports = (robot) ->
   jiraUrl = process.env.HUBOT_JIRA_URL || "https://#{process.env.HUBOT_JIRA_DOMAIN}"
   jiraUsername = process.env.HUBOT_JIRA_USERNAME
   jiraPassword = process.env.HUBOT_JIRA_PASSWORD
+  jiraLookup = process.env.HUBOT_JIRA_ISSUE_LOOKUP || 'true'
 
   if jiraUsername != undefined && jiraUsername.length > 0
     auth = "#{jiraUsername}:#{jiraPassword}"
@@ -77,6 +79,7 @@ module.exports = (robot) ->
           msg.send response
 
       robot.hear jiraPattern, (msg) ->
+        return if jiraLookup == 'false'
         return if msg.message.user.name.match(new RegExp(jiraIgnoreUsers, "gi"))
         return if msg.message.text.match(new RegExp(/move jira (.+) to (.+)/))
 
